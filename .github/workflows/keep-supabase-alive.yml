@@ -1,0 +1,15 @@
+name: Keep Supabase Active
+on:
+    schedule:
+        - cron: '0 12 * * *' # Run it every day at noon.
+    workflow_dispatch: # Allow manual trigger.
+jobs:
+    keep-alive:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Ping Supabase
+              run: |
+                  curl -X POST "https://你的專案ID.supabase.co/rest/v1/rpc/ping" \
+                    -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+                    -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+                    -H "Content-Type: application/json"
