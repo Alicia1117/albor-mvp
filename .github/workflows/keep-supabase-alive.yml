@@ -3,6 +3,8 @@ on:
     schedule:
         - cron: '0 12 * * *' # Run it every day at noon.
     workflow_dispatch: # Allow manual trigger.
+    push:
+        branches: [main, dev]
 jobs:
     keep-alive:
         runs-on: ubuntu-latest
