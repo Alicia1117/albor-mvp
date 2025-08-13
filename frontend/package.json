@@ -9,11 +9,11 @@
         "lint": "next lint"
     },
     "dependencies": {
+        "@albor-mvp/shared": "*",
         "@supabase/supabase-js": "^2.50.2",
-        "next": "15.3.4",
+        "next": "^15.4.6",
         "react": "^19.0.0",
-        "react-dom": "^19.0.0",
-        "@albor-mvp/shared": "*"
+        "react-dom": "^19.0.0"
     },
     "devDependencies": {
         "@eslint/eslintrc": "^3",
