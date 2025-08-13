@@ -1,4 +1,7 @@
 {
+    "name": "albor-mvp",
+    "private": true,
+    "version": "1.0.0",
     "workspaces": [
         "frontend",
         "backend",

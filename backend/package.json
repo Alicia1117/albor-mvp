@@ -27,7 +27,7 @@
     "@supabase/supabase-js": "^2.50.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "@shared": "*"
+    "@albor-mvp/shared": "*"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
