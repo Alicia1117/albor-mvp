@@ -14,7 +14,60 @@ datasource db {
 }
 
 model User {
-  id    String @id @default(uuid())
-  email String @unique
-  name  String?
+  id        String     @id @default(uuid())
+  email     String     @unique
+  name      String?
+  notes     Note[]
+  poems     Poem[]
+  favorites Favorite[]
+  createdAt DateTime   @default(now())
+}
+
+model Note {
+  id        String     @id @default(uuid())
+  title     String
+  content   String
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+  tags      NoteTag[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Poem {
+  id        String     @id @default(uuid())
+  title     String
+  author    String?
+  content   String
+  userId    String?
+  user      User?      @relation(fields: [userId], references: [id])
+  favorites Favorite[]
+  createdAt DateTime   @default(now())
+}
+
+model Favorite {
+  id        String     @id @default(uuid())
+  userId    String
+  poemId    String
+
+  user      User       @relation(fields: [userId], references: [id])
+  poem      Poem       @relation(fields: [poemId], references: [id])
+  createdAt DateTime   @default(now())
+}
+
+model Tag {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  notes     NoteTag[]
+  createdAt DateTime   @default(now())
+}
+
+model NoteTag {
+  noteId String
+  tagId  String
+
+  note   Note   @relation(fields: [noteId], references: [id])
+  tag    Tag    @relation(fields: [tagId], references: [id])
+
+  @@id([noteId, tagId])
 }
