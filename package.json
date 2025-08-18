@@ -15,5 +15,8 @@
     "devDependencies": {
         "concurrently": "^9.0.0",
         "rimraf": "^5.0.10"
+    },
+    "dependencies": {
+        "zod": "^4.0.17"
     }
 }

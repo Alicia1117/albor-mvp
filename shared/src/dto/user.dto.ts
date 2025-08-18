@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { idSchema, isoDateTimeSchema } from './base';
+import { idSchema, isoDateTimeSchema } from '../base';
 
 /**
  * 基本 User DTO（不展開關聯陣列，避免 payload 膨脹）

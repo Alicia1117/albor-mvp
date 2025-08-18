@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import type { UserDTO } from '@albor-mvp/shared/src/dto/user.dto';
+import type { UserDTO } from '@albor-mvp/shared';
 import { supabase } from '@/lib/supabaseClient';
 
 type User = UserDTO;

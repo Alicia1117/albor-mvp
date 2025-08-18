@@ -1,10 +1,33 @@
 {
     "name": "@albor-mvp/shared",
     "version": "1.0.0",
-    "main": "index.ts",
-    "types": "index.ts",
     "private": true,
+    "type": "module",
+    "main": "dist/index.cjs",
+    "module": "dist/index.mjs",
+    "types": "dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "require": "./dist/index.cjs",
+            "import": "./dist/index.mjs",
+            "default": "./dist/index.mjs"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "clean": "rimraf dist",
+        "build": "tsup src/index.ts --dts --format esm,cjs --out-dir dist --clean",
+        "dev": "tsup src/index.ts --dts --format esm,cjs --out-dir dist --watch"
+    },
     "dependencies": {
         "zod": "^4.0.17"
+    },
+    "devDependencies": {
+        "rimraf": "^5.0.10",
+        "tsup": "^8.5.0",
+        "typescript": "^5.9.2"
     }
 }
