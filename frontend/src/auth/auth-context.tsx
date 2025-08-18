@@ -18,6 +18,22 @@ type AuthContextValue = AuthState & {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// 🔧 抽出映射：Supabase user -> UserDTO
+function toUserDTO(
+    u: NonNullable<
+        Awaited<ReturnType<typeof supabase.auth.getUser>>['data']['user']
+    >
+): User {
+    return {
+        id: u.id,
+        email: u.email ?? '',
+        createdAt: u.created_at ?? '',
+        name:
+            ((u.user_metadata as Record<string, unknown>)?.name as string) ??
+            null,
+    };
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [loading, setLoading] = useState<boolean>(true);
     const [user, setUser] = useState<User | null>(null);
@@ -26,40 +42,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         let mounted = true;
 
         const initAuth = async () => {
-            const {
-                data: { session },
-            } = await supabase.auth.getSession();
-            if (mounted) {
-                setUser(
-                    session?.user
-                        ? {
-                              id: session.user.id,
-                              email: session.user.email ?? '',
-                              createdAt: session.user.created_at ?? '',
-                              name: session.user.user_metadata?.name ?? null,
-                          }
-                        : null
-                );
-                setLoading(false);
+            try {
+                const { data, error } = await supabase.auth.getSession();
+                if (!mounted) return;
+                if (error) {
+                    console.error('[auth] getSession error:', error);
+                    setUser(null);
+                } else {
+                    setUser(
+                        data.session?.user ? toUserDTO(data.session.user) : null
+                    );
+                }
+            } finally {
+                if (mounted) setLoading(false);
             }
         };
 
         const {
             data: { subscription },
         } = supabase.auth.onAuthStateChange((_event, session) => {
-            if (mounted) {
-                setUser(
-                    session?.user
-                        ? {
-                              id: session.user.id,
-                              email: session.user.email ?? '',
-                              createdAt: session.user.created_at ?? '',
-                              name: session.user.user_metadata?.name ?? null,
-                          }
-                        : null
-                );
-                setLoading(false);
-            }
+            if (!mounted) return;
+            setUser(session?.user ? toUserDTO(session.user) : null);
+            // 不再在這裡 setLoading(false)；初始化流程會處理，之後狀態即時更新
         });
 
         initAuth();
@@ -78,8 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             password,
         });
         if (error) throw error;
-
-        throw new Error('Not implemented');
+        console.log('signIn 還沒串接完成');
     };
 
     const signOut = async () => {
@@ -87,8 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         const { error } = await supabase.auth.signOut();
         if (error) throw error;
-
-        throw new Error('Not implemented');
+        console.log('signOut 還沒串接完成');
     };
 
     const value = useMemo<AuthContextValue>(
