@@ -14,60 +14,72 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
+  id        String   @id @db.Uuid            
+  email     String   @unique
   name      String?
   notes     Note[]
   poems     Poem[]
   favorites Favorite[]
-  createdAt DateTime   @default(now())
+  createdAt DateTime @default(now())
+
+  @@map("users")                             // 對齊資料庫表名 public.users
 }
 
 model Note {
-  id        String     @id @default(uuid())
+  id        String     @id @default(uuid()) @db.Uuid
   title     String
   content   String
-  userId    String
-  user      User       @relation(fields: [userId], references: [id])
+  userId    String     @db.Uuid
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)  // 加 onDelete
   tags      NoteTag[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+
+  @@map("notes")
 }
 
 model Poem {
-  id        String     @id @default(uuid())
+  id        String     @id @default(uuid()) @db.Uuid
   title     String
   author    String?
   content   String
-  userId    String?
-  user      User?      @relation(fields: [userId], references: [id])
+  userId    String?    @db.Uuid              // ← 保持 optional
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)  // 加 onDelete
   favorites Favorite[]
   createdAt DateTime   @default(now())
+
+  @@map("poems")
 }
 
 model Favorite {
-  id        String     @id @default(uuid())
-  userId    String
-  poemId    String
+  id        String     @id @default(uuid()) @db.Uuid
+  userId    String     @db.Uuid
+  poemId    String     @db.Uuid
 
-  user      User       @relation(fields: [userId], references: [id])
-  poem      Poem       @relation(fields: [poemId], references: [id])
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)  // 加 onDelete
+  poem      Poem       @relation(fields: [poemId], references: [id], onDelete: Cascade)  // 加 onDelete
   createdAt DateTime   @default(now())
+
+  @@unique([userId, poemId])  // 防止重複收藏
+  @@map("favorites")
 }
 
 model Tag {
-  id        String     @id @default(uuid())
+  id        String     @id @default(uuid()) @db.Uuid
   name      String     @unique
   notes     NoteTag[]
   createdAt DateTime   @default(now())
+
+  @@map("tags")
 }
 
 model NoteTag {
-  noteId String
-  tagId  String
+  noteId String @db.Uuid
+  tagId  String @db.Uuid
 
-  note   Note   @relation(fields: [noteId], references: [id])
-  tag    Tag    @relation(fields: [tagId], references: [id])
+  note   Note   @relation(fields: [noteId], references: [id], onDelete: Cascade)  // 加 onDelete
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)   // 加 onDelete
 
   @@id([noteId, tagId])
+  @@map("note_tags")
 }

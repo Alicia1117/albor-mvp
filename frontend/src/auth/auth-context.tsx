@@ -1,6 +1,13 @@
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
 import type { UserDTO } from '@albor-mvp/shared';
 import { supabase } from '@/lib/supabaseClient';
 
@@ -46,7 +53,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 const { data, error } = await supabase.auth.getSession();
                 if (!mounted) return;
                 if (error) {
-                    console.error('[auth] getSession error:', error);
                     setUser(null);
                 } else {
                     setUser(
@@ -63,7 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } = supabase.auth.onAuthStateChange((_event, session) => {
             if (!mounted) return;
             setUser(session?.user ? toUserDTO(session.user) : null);
-            // 不再在這裡 setLoading(false)；初始化流程會處理，之後狀態即時更新
+            // loading 由初始化流程控制；之後只要即時更新 user
         });
 
         initAuth();
@@ -74,28 +80,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
     }, []);
 
-    const signIn = async (email: string, password: string) => {
-        // TODO: 接 supabase
-
+    const signIn = useCallback(async (email: string, password: string) => {
         const { error } = await supabase.auth.signInWithPassword({
             email,
             password,
         });
-        if (error) throw error;
-        console.log('signIn 還沒串接完成');
-    };
+        if (error) throw error; // 讓呼叫端決定怎麼顯示錯誤/導頁
+    }, []);
 
-    const signOut = async () => {
-        // TODO: 接 supabase
-
+    const signOut = useCallback(async () => {
         const { error } = await supabase.auth.signOut();
         if (error) throw error;
-        console.log('signOut 還沒串接完成');
-    };
+    }, []);
 
     const value = useMemo<AuthContextValue>(
         () => ({ loading, user, signIn, signOut }),
-        [loading, user]
+        [loading, user, signIn, signOut]
     );
 
     return (
